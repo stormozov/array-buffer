@@ -12,23 +12,23 @@ describe('Класс Character', () => {
       expect(character).toBeInstanceOf(Character);
     });
 
-    it('Должен выдать ошибку при вводе имени не в виде строки', () => {
+    it('Выбрасывает ошибку при вводе имени не в виде строки', () => {
       expect(() => new Character(123, 'Swordsman')).toThrow(throwsDict.name);
     });
 
-    it('Должен выдать ошибку при вводе имени меньше 2 символов', () => {
+    it('Выбрасывает при вводе имени меньше 2 символов', () => {
       expect(() => new Character('В', 'Swordsman')).toThrow(throwsDict.name);
     });
 
-    it('Должен выдать ошибку при вводе имени больше 10 символов', () => {
+    it('Выбрасывает ошибку при вводе имени больше 10 символов', () => {
       expect(() => new Character('Максимилиан', 'Swordsman')).toThrow(throwsDict.name);
     });
 
-    it('Должен выдать ошибку при вводе типа не в виде строки', () => {
+    it('Выбрасывает ошибку при вводе типа персонажа не в виде строки', () => {
       expect(() => new Character('Робин', 123)).toThrow(throwsDict.type);
     });
 
-    it('Должен выдать ошибку при вводе типа, которого нет в списке', () => {
+    it('Выбрасывает ошибку при вводе типа персонажа, которого нет в списке', () => {
       expect(() => new Character('Робин', 'Archer')).toThrow(throwsDict.type);
     });
   });
@@ -36,6 +36,7 @@ describe('Класс Character', () => {
   describe('Методы', () => {
     describe('attributes()', () => {
       let instance;
+
       const expectedAttributes = {
         health: 200,
         level: 2,
@@ -90,7 +91,7 @@ describe('Класс Character', () => {
         expect(instance).not.toHaveProperty('test');
       });
 
-      it('Должен выбросить ошибку при присвоении не объекта параметру attrs', () => {
+      it('Выбрасывает ошибку, если attrs не объект', () => {
         const nonObjectValue = [
           'nonObjectValue',
           123,
@@ -106,8 +107,8 @@ describe('Класс Character', () => {
         });
       });
 
-      it('Должен выбросить ошибку при присвоении нечислового значения свойству health', () => {
-        const invalidTypes = ['string', 'boolean', 'object', 'function', 'symbol', 'bigint'];
+      it('Выбрасывает ошибку, если health не число', () => {
+        const invalidTypes = ['string', true, {}, [], null, undefined, Symbol(''), BigInt(0)];
 
         invalidTypes.forEach((type) => {
           expect(() => instance.attributes = { health: type })
@@ -115,7 +116,17 @@ describe('Класс Character', () => {
         });
       });
 
-      it('Должен выбросить ошибку при присвоении нестрокового значения свойству name', () => {
+      it('Выбрасывает ошибку, если health отрицательное', () => {
+        expect(() => instance.attributes = { health: -10 })
+          .toThrow('Свойство health не может быть отрицательным.');
+      });
+
+      it('Выбрасывает ошибку, если level не целое число', () => {
+        expect(() => instance.attributes = { level: 1.5 })
+          .toThrow('Свойство level должно быть целым числом.');
+      });
+
+      it('Выбрасывает ошибку, если name не строка', () => {
         const invalidTypes = [123, false, NaN, Symbol(''), BigInt(0)];
 
         invalidTypes.forEach((type) => {
@@ -124,7 +135,7 @@ describe('Класс Character', () => {
         });
       });
 
-      it('Должен выбросить ошибку при присвоении нестрокового значения свойству type', () => {
+      it('Выбрасывает ошибку, если type не строка', () => {
         const invalidTypes = [123, false, NaN, Symbol(''), BigInt(0)];
 
         invalidTypes.forEach((typeValue) => {

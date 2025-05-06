@@ -127,6 +127,12 @@ export default class Character {
       if (typeof value !== 'number') {
         throw new Error(`Свойство ${key} должно быть числом.`);
       }
+      if (value < 0) {
+        throw new Error(`Свойство ${key} не может быть отрицательным.`);
+      }
+      if (!Number.isInteger(value)) {
+        throw new Error(`Свойство ${key} должно быть целым числом.`);
+      }
     }
   }
 }
