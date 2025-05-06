@@ -48,108 +48,116 @@ describe('Класс Character', () => {
         instance = new Character('Робин', 'Swordsman');
       });
 
-      it('Должен оставить атрибуты без изменений', () => {
-        const expectedAttributes = {
-          health: 100,
-          level: 1,
-          defense: 0,
-          distance: 1,
-        };
+      describe('Установка корректных атрибутов', () => {
+        it('Должен оставить атрибуты без изменений', () => {
+          const expectedAttributes = {
+            health: 100,
+            level: 1,
+            defense: 0,
+            distance: 1,
+          };
 
-        Object.entries(expectedAttributes).forEach(([key, value]) => {
-          expect(instance[key]).toBe(value);
+          Object.entries(expectedAttributes).forEach(([key, value]) => {
+            expect(instance[key]).toBe(value);
+          });
+        });
+
+        it('Должен установить новые атрибуты', () => {
+          instance.attributes = expectedAttributes;
+
+          Object.entries(expectedAttributes).forEach(([key, value]) => {
+            expect(instance[key]).toBe(value);
+          });
+        });
+
+        it('Должен обновить существующие атрибуты даже если переданы несуществующие', () => {
+          instance.attributes = {
+            ...expectedAttributes,
+            attack: 10,
+            test: 'nonExistentValue',
+          };
+
+          Object.entries(expectedAttributes).forEach(([key, value]) => {
+            expect(instance[key]).toBe(value);
+          });
+        });
+
+        it('Не должен добавлять несуществующие атрибуты', () => {
+          instance.attributes = {
+            attack: 10,
+            test: 'nonExistentValue',
+          };
+
+          expect(instance.attack).toBe(0);
+          expect(instance).not.toHaveProperty('test');
         });
       });
 
-      it('Должен установить новые атрибуты', () => {
-        instance.attributes = expectedAttributes;
+      describe('Обработка невалидных данных', () => {
+        it('Выбрасывает ошибку, если attrs не объект', () => {
+          const nonObjectValue = [
+            'nonObjectValue',
+            123,
+            false,
+            NaN,
+            Symbol(''),
+            BigInt(0),
+          ];
 
-        Object.entries(expectedAttributes).forEach(([key, value]) => {
-          expect(instance[key]).toBe(value);
+          nonObjectValue.forEach((value) => {
+            expect(() => instance.attributes = value)
+              .toThrow(`Параметр attrs должен быть объектом. Проведена проверка: ${typeof value}.`);
+          });
+        });
+
+        it('Выбрасывает ошибку, если health не число', () => {
+          const invalidTypes = ['string', true, {}, [], null, undefined, Symbol(''), BigInt(0)];
+
+          invalidTypes.forEach((type) => {
+            expect(() => instance.attributes = { health: type })
+              .toThrow('Свойство health должно быть числом.');
+          });
+        });
+
+        it('Выбрасывает ошибку, если health отрицательное', () => {
+          expect(() => instance.attributes = { health: -10 })
+            .toThrow('Свойство health не может быть отрицательным.');
+        });
+
+        it('Выбрасывает ошибку, если level не целое число', () => {
+          expect(() => instance.attributes = { level: 1.5 })
+            .toThrow('Свойство level должно быть целым числом.');
+        });
+
+        it('Выбрасывает ошибку, если name не строка', () => {
+          const invalidTypes = [123, false, NaN, Symbol(''), BigInt(0)];
+
+          invalidTypes.forEach((type) => {
+            expect(() => instance.attributes = { name: type })
+              .toThrow('Имя должно быть строкой длиной от 2 до 10 символов.');
+          });
+        });
+
+        it('Выбрасывает ошибку, если type не строка', () => {
+          const invalidTypes = [123, false, NaN, Symbol(''), BigInt(0)];
+
+          invalidTypes.forEach((typeValue) => {
+            expect(() => instance.attributes = { type: typeValue })
+              .toThrow('Некорректный тип персонажа.');
+          });
         });
       });
 
-      it('Должен обновить существующие атрибуты даже если переданы несуществующие', () => {
-        instance.attributes = {
-          ...expectedAttributes,
-          attack: 10,
-          test: 'nonExistentValue',
-        };
-
-        Object.entries(expectedAttributes).forEach(([key, value]) => {
-          expect(instance[key]).toBe(value);
+      describe('Игнорирование некорректных значений', () => {
+        it('Должен игнорировать null', () => {
+          instance.attributes = null;
+          expect(instance.health).toBe(100);
         });
-      });
 
-      it('Не должен добавлять несуществующие атрибуты', () => {
-        instance.attributes = {
-          attack: 10,
-          test: 'nonExistentValue',
-        };
-
-        expect(instance.attack).toBe(0);
-        expect(instance).not.toHaveProperty('test');
-      });
-
-      it('Выбрасывает ошибку, если attrs не объект', () => {
-        const nonObjectValue = [
-          'nonObjectValue',
-          123,
-          false,
-          NaN,
-          Symbol(''),
-          BigInt(0),
-        ];
-
-        nonObjectValue.forEach((value) => {
-          expect(() => instance.attributes = value)
-            .toThrow(`Параметр attrs должен быть объектом. Проведена проверка: ${typeof value}.`);
+        it('Должен игнорировать undefined', () => {
+          instance.attributes = undefined;
+          expect(instance.health).toBe(100);
         });
-      });
-
-      it('Выбрасывает ошибку, если health не число', () => {
-        const invalidTypes = ['string', true, {}, [], null, undefined, Symbol(''), BigInt(0)];
-
-        invalidTypes.forEach((type) => {
-          expect(() => instance.attributes = { health: type })
-            .toThrow('Свойство health должно быть числом.');
-        });
-      });
-
-      it('Выбрасывает ошибку, если health отрицательное', () => {
-        expect(() => instance.attributes = { health: -10 })
-          .toThrow('Свойство health не может быть отрицательным.');
-      });
-
-      it('Выбрасывает ошибку, если level не целое число', () => {
-        expect(() => instance.attributes = { level: 1.5 })
-          .toThrow('Свойство level должно быть целым числом.');
-      });
-
-      it('Выбрасывает ошибку, если name не строка', () => {
-        const invalidTypes = [123, false, NaN, Symbol(''), BigInt(0)];
-
-        invalidTypes.forEach((type) => {
-          expect(() => instance.attributes = { name: type })
-            .toThrow('Имя должно быть строкой длиной от 2 до 10 символов.');
-        });
-      });
-
-      it('Выбрасывает ошибку, если type не строка', () => {
-        const invalidTypes = [123, false, NaN, Symbol(''), BigInt(0)];
-
-        invalidTypes.forEach((typeValue) => {
-          expect(() => instance.attributes = { type: typeValue })
-            .toThrow('Некорректный тип персонажа.');
-        });
-      });
-
-      it('Должен игнорировать null или undefined', () => {
-        instance.attributes = null;
-        expect(instance.health).toBe(100);
-        
-        instance.attributes = undefined;
-        expect(instance.health).toBe(100);
       });
     });
 
