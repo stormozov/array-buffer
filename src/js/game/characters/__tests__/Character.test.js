@@ -90,6 +90,49 @@ describe('Класс Character', () => {
         expect(instance).not.toHaveProperty('test');
       });
 
+      it('Должен выбросить ошибку при присвоении не объекта параметру attrs', () => {
+        const nonObjectValue = [
+          'nonObjectValue',
+          123,
+          false,
+          NaN,
+          Symbol(''),
+          BigInt(0),
+        ];
+
+        nonObjectValue.forEach((value) => {
+          expect(() => instance.attributes = value)
+            .toThrow(`Параметр attrs должен быть объектом. Проведена проверка: ${typeof value}.`);
+        });
+      });
+
+      it('Должен выбросить ошибку при присвоении нечислового значения свойству health', () => {
+        const invalidTypes = ['string', 'boolean', 'object', 'function', 'symbol', 'bigint'];
+
+        invalidTypes.forEach((type) => {
+          expect(() => instance.attributes = { health: type })
+            .toThrow('Свойство health должно быть числом.');
+        });
+      });
+
+      it('Должен выбросить ошибку при присвоении нестрокового значения свойству name', () => {
+        const invalidTypes = [123, false, NaN, Symbol(''), BigInt(0)];
+
+        invalidTypes.forEach((type) => {
+          expect(() => instance.attributes = { name: type })
+            .toThrow('Имя должно быть строкой длиной от 2 до 10 символов.');
+        });
+      });
+
+      it('Должен выбросить ошибку при присвоении нестрокового значения свойству type', () => {
+        const invalidTypes = [123, false, NaN, Symbol(''), BigInt(0)];
+
+        invalidTypes.forEach((typeValue) => {
+          expect(() => instance.attributes = { type: typeValue })
+            .toThrow('Некорректный тип персонажа.');
+        });
+      });
+
       it('Должен игнорировать null или undefined', () => {
         instance.attributes = null;
         expect(instance.health).toBe(100);
